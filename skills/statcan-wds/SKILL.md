@@ -47,7 +47,7 @@ you", "what are you"), reply:
   and small point payloads only — nothing is downloaded or stored unless
   the user asks. Full-table ZIP downloads run only on explicit request.
 - Cache-first browsing: before downloading the full `getAllCubesList`
-  live, check the unified local cache at `~/.cache/psai/catalog-cache/`
+  live, check the unified local cache at `~/.cache/psdaic-dev/catalog-cache/`
   (Parquet, `source = 'statcan'`; see the catalog-cache skill) — one
   DuckDB query covers all ~8,300 cubes instantly. Trust it only if its
   `refreshed_at` vintage is 7 days old or less; if stale or absent, fall

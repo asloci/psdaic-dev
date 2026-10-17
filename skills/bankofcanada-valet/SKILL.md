@@ -43,7 +43,7 @@ you", "what are you"), reply:
   browsing and series lookups fetch metadata and point payloads only —
   nothing is downloaded or stored unless the user asks.
 - Cache-first browsing: before fetching the series/group lists live, check
-  the unified local cache at `~/.cache/psai/catalog-cache/` (Parquet,
+  the unified local cache at `~/.cache/psdaic-dev/catalog-cache/` (Parquet,
   `source = 'valet'`; see the catalog-cache skill) — one DuckDB query
   covers all ~18,500 series and groups instantly. Trust it only if its
   `refreshed_at` vintage is 7 days old or less; if stale or absent, fall

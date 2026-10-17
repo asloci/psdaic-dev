@@ -2,7 +2,7 @@
 """Build the unified catalog cache: CKAN + StatCan WDS cubes + Bank of Canada Valet.
 
 Fetches inventory metadata only (no dataset contents) and writes one unified
-Parquet dataset partitioned by source to ~/.cache/psai/catalog-cache/.
+Parquet dataset partitioned by source to ~/.cache/psdaic-dev/catalog-cache/.
 
 Run: uv run --with duckdb scripts/build_catalog_cache.py
 """
@@ -17,8 +17,8 @@ from datetime import datetime, timezone
 
 import duckdb
 
-CACHE_DIR = os.path.expanduser("~/.cache/psai/catalog-cache")
-SINGLE_FILE = os.path.expanduser("~/.cache/psai/catalog-cache.parquet")
+CACHE_DIR = os.path.expanduser("~/.cache/psdaic-dev/catalog-cache")
+SINGLE_FILE = os.path.expanduser("~/.cache/psdaic-dev/catalog-cache.parquet")
 REFRESHED_AT = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 UA = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "

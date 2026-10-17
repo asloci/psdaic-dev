@@ -46,7 +46,7 @@ you", "what are you"), reply:
   For data points, series values, or table contents, hand off to the
   matching live skill (open-canada-catalog, statcan-wds,
   bankofcanada-valet) with the id/url found here.
-- Cache location (conventional path): `~/.cache/psai/catalog-cache/`,
+- Cache location (conventional path): `~/.cache/psdaic-dev/catalog-cache/`,
   partitioned `source=ckan|statcan|valet`. A published nightly vintage
   lives over https as a dated GitHub release asset
   (`catalog-cache-vYYYY.MM.DD`); read it the same way with DuckDB.
@@ -71,7 +71,7 @@ you", "what are you"), reply:
   extraction, persistent identifier):
 
   ```
-  <Publisher>. "<Title>" (<id>) [dataset]. <Publisher>. Catalog record accessed <extraction date YYYY-MM-DD> via psai catalog cache vintage <refreshed_at>. <url>
+  <Publisher>. "<Title>" (<id>) [dataset]. <Publisher>. Catalog record accessed <extraction date YYYY-MM-DD> via psdaic-dev catalog cache vintage <refreshed_at>. <url>
   ```
 
   URLs must come verbatim from the cache row's `url` column — never
@@ -93,7 +93,7 @@ Example prompts:
 Work down this tree in order; stop at the first step that works.
 
 1. **Local cache, fresh.** Query
-   `~/.cache/psai/catalog-cache/**/*.parquet` with
+   `~/.cache/psdaic-dev/catalog-cache/**/*.parquet` with
    `hive_partitioning=1` (see Querying the cache). Check
    `refreshed_at` first; trust it only if it is within 7 days.
 
@@ -104,12 +104,12 @@ Work down this tree in order; stop at the first step that works.
 
    ```sql
    SELECT source, count(*) AS n
-   FROM read_parquet('https://github.com/asloci/psai/releases/download/catalog-cache-v<YYYY.MM.DD>/catalog-cache-v<YYYY.MM.DD>.parquet')
+   FROM read_parquet('https://github.com/asloci/psdaic-dev/releases/download/catalog-cache-v<YYYY.MM.DD>/catalog-cache-v<YYYY.MM.DD>.parquet')
    GROUP BY source;
    ```
 
    Pick the most recent `catalog-cache-v*` release on
-   github.com/asloci/psai/releases (a nightly workflow mints one per
+   github.com/asloci/psdaic-dev/releases (a nightly workflow mints one per
    day, so it is at most 1 day old — always inside the 7-day window;
    check the release date for one-off reads). The release asset has no
    `source` partition folders — it is a single file, so no
@@ -118,7 +118,7 @@ Work down this tree in order; stop at the first step that works.
 3. **Build or go live.** Offline, httpfs unavailable, or the asset is
    beyond the trust window? Either rebuild locally —
    `uv run --with duckdb scripts/build_catalog_cache.py` (~1-3 min,
-   writes `~/.cache/psai/catalog-cache/`) — or go live to the source
+   writes `~/.cache/psdaic-dev/catalog-cache/`) — or go live to the source
    APIs via the sibling skills (open-canada-catalog, statcan-wds,
    bankofcanada-valet). Say which path you took.
 
@@ -128,22 +128,22 @@ One table, three sources, instant search:
 
 ```sql
 -- Schema
-DESCRIBE SELECT * FROM read_parquet('~/.cache/psai/catalog-cache/**/*.parquet', hive_partitioning=1);
+DESCRIBE SELECT * FROM read_parquet('~/.cache/psdaic-dev/catalog-cache/**/*.parquet', hive_partitioning=1);
 
 -- Everything about a topic, across all three catalogs
 SELECT source, id, title, publisher, formats
-FROM read_parquet('~/.cache/psai/catalog-cache/**/*.parquet', hive_partitioning=1)
+FROM read_parquet('~/.cache/psdaic-dev/catalog-cache/**/*.parquet', hive_partitioning=1)
 WHERE title ILIKE '%consumer price index%'
 ORDER BY source, title;
 
 -- Counts by source
 SELECT source, count(*) AS n
-FROM read_parquet('~/.cache/psai/catalog-cache/**/*.parquet', hive_partitioning=1)
+FROM read_parquet('~/.cache/psdaic-dev/catalog-cache/**/*.parquet', hive_partitioning=1)
 GROUP BY source;
 
 -- Department-by-format breakdown (CKAN rows; formats is a CSV list)
 SELECT publisher, formats, count(*) AS n
-FROM read_parquet('~/.cache/psai/catalog-cache/**/*.parquet', hive_partitioning=1)
+FROM read_parquet('~/.cache/psdaic-dev/catalog-cache/**/*.parquet', hive_partitioning=1)
 WHERE source = 'ckan'
 GROUP BY publisher, formats ORDER BY n DESC;
 ```
@@ -172,13 +172,13 @@ and full-glob queries may duplicate the column.
 ```bash
 # ~1-3 min: 48 paginated CKAN calls + one WDS GET + two Valet list GETs
 uv run --with duckdb scripts/build_catalog_cache.py
-# -> writes ~/.cache/psai/catalog-cache/source={ckan,statcan,valet}/data_0.parquet
+# -> writes ~/.cache/psdaic-dev/catalog-cache/source={ckan,statcan,valet}/data_0.parquet
 ```
 
 The script is pure stdlib + DuckDB (installed ephemerally by `uv`), sends a
 browser User-Agent (StatCan rejects bare clients with 503), and retries
 each request three times. It writes two artifacts: the partitioned
-directory above, and a single-file `~/.cache/psai/catalog-cache.parquet`
+directory above, and a single-file `~/.cache/psdaic-dev/catalog-cache.parquet`
 (~8 MB) — the same shape published nightly as a GitHub release asset.
 Overwrites in place; a partially failed rebuild leaves the previous
 vintage intact until the COPY succeeds.

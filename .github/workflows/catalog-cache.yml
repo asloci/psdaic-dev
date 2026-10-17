@@ -30,10 +30,10 @@ jobs:
         run: |
           DATE=$(date -u +%Y.%m.%d)
           TAG="catalog-cache-v${DATE}"
-          cp ~/.cache/psai/catalog-cache.parquet "catalog-cache-v${DATE}.parquet"
+          cp ~/.cache/psdaic-dev/catalog-cache.parquet "catalog-cache-v${DATE}.parquet"
           gh release create "${TAG}" "catalog-cache-v${DATE}.parquet" \
             --title "Catalog cache ${DATE}" \
-            --notes "Unified catalog cache (CKAN + StatCan WDS + Bank of Canada Valet), single Parquet file, built ${DATE}. Read in place with DuckDB: read_parquet('https://github.com/asloci/psai/releases/download/${TAG}/catalog-cache-v${DATE}.parquet')" \
+            --notes "Unified catalog cache (CKAN + StatCan WDS + Bank of Canada Valet), single Parquet file, built ${DATE}. Read in place with DuckDB: read_parquet('https://github.com/asloci/psdaic-dev/releases/download/${TAG}/catalog-cache-v${DATE}.parquet')" \
             || gh release upload "${TAG}" "catalog-cache-v${DATE}.parquet" --clobber
 
       - name: Prune old vintages (keep latest 7)

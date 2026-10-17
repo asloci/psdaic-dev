@@ -45,7 +45,7 @@ you", "what are you"), reply:
   are listed, never fetched. Only Step 3, run on explicit request, reads a
   dataset's contents.
 - Cache-first browsing: before live `package_search` calls, check the
-  unified local cache at `~/.cache/psai/catalog-cache/` (Parquet,
+  unified local cache at `~/.cache/psdaic-dev/catalog-cache/` (Parquet,
   `source = 'ckan'`; see the catalog-cache skill) — one DuckDB query covers
   all ~48,000 datasets instantly. Trust it only if its `refreshed_at`
   vintage is 7 days old or less; if stale or absent, fall back to the live

@@ -96,22 +96,22 @@ INSTALL httpfs; LOAD httpfs;
 -- Cross-catalog search: every record whose title mentions consumer price index
 -- (verified 2026-10-01: CKAN 28, StatCan 23, Valet 10 hits)
 SELECT source, id, title, url
-FROM read_parquet('https://github.com/asloci/psai/releases/download/catalog-cache-v<YYYY.MM.DD>/catalog-cache-v<YYYY.MM.DD>.parquet')
+FROM read_parquet('https://github.com/asloci/psdaic-dev/releases/download/catalog-cache-v<YYYY.MM.DD>/catalog-cache-v<YYYY.MM.DD>.parquet')
 WHERE title ILIKE '%consumer price index%';
 ```
 
-Replace `<YYYY.MM.DD>` with the latest date on the [Releases](https://github.com/asloci/psai/releases) page — a new vintage is published every night, and the last 7 are kept.
+Replace `<YYYY.MM.DD>` with the latest date on the [Releases](https://github.com/asloci/psdaic-dev/releases) page — a new vintage is published every night, and the last 7 are kept.
 
 Schema: `source, id, title, publisher, description, formats, url, last_modified, refreshed_at`. Search is plain text (`ILIKE`) — no embeddings, no search service.
 
 Three ways to read it:
 
 1. **Straight from the release asset over https** — the query above. No download, no build; the first result returns in seconds.
-2. **Build it locally** (the offline, data-sovereignty path; the skills prefer it when a fresh copy exists): run `uv run --with duckdb scripts/build_catalog_cache.py` once (1–3 minutes, dominated by CKAN's paginated fetch). It writes to `~/.cache/psai/catalog-cache/`:
+2. **Build it locally** (the offline, data-sovereignty path; the skills prefer it when a fresh copy exists): run `uv run --with duckdb scripts/build_catalog_cache.py` once (1–3 minutes, dominated by CKAN's paginated fetch). It writes to `~/.cache/psdaic-dev/catalog-cache/`:
 
    ```sql
    -- hive_partitioning=1 is optional on current DuckDB (auto-detected); it keeps older versions working
-   SELECT * FROM read_parquet('~/.cache/psai/catalog-cache/**/*.parquet', hive_partitioning=1) LIMIT 10;
+   SELECT * FROM read_parquet('~/.cache/psdaic-dev/catalog-cache/**/*.parquet', hive_partitioning=1) LIMIT 10;
    ```
 
 3. **No cache, no build** — the skills go straight to the live source APIs.
